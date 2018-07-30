@@ -3,4 +3,12 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="epgBackgroundColor">#ff1e1e1e</color>
+    <color name="epgChannelBackgroundColor">#ff323232</color>
+    <color name="epgChannelEventBackgroundColor">#ff4f4f4f</color>
+    <color name="epgCurrentChannelEventBackgroundColor">#ff3b3b3b</color>
+    <color name="epgChannelEventTextColor">#ffd6d6d6</color>
+    <color name="epgCurrentTimeBarColor">#ffc57120</color>
+
 </resources>

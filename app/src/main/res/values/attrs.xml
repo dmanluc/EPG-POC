@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="EPG">
+        <attr name="epgBackgroundColor" format="color"/>
+        <attr name="epgChannelMargin" format="dimension"/>
+        <attr name="epgChannelPadding" format="dimension"/>
+        <attr name="epgChannelWidth" format="dimension"/>
+        <attr name="epgChannelHeight" format="dimension"/>
+        <attr name="epgChannelBackgroundColor" format="color"/>
+        <attr name="epgChannelEventBackgroundColor" format="color"/>
+        <attr name="epgChannelCurrentEventBackgroundColor" format="color"/>
+        <attr name="epgChannelEventTextColor" format="color"/>
+        <attr name="epgChannelEventTextSize" format="dimension"/>
+        <attr name="epgTimeBarHeight" format="dimension"/>
+        <attr name="epgTimeBarTextSize" format="dimension"/>
+        <attr name="epgTimeBarLineWidth" format="dimension"/>
+        <attr name="epgTimeBarLineColor" format="color"/>
+        <attr name="epgNowButtonSize" format="dimension"/>
+        <attr name="epgNowButtonMargin" format="dimension"/>
+    </declare-styleable>
+
+</resources>
