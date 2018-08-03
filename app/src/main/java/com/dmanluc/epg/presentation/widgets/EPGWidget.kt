@@ -478,6 +478,7 @@ class EPGWidget : ViewGroup {
         // Time stamps
         paint.color = channelEventTextColor
         paint.textSize = timeBarTextSize.toFloat()
+        paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
 
         for (i in 0..HOURS_TIMELINE_IN_MILLIS / TIME_SPACING_TIMELINE_IN_MILLIS) {
             // Get time and round to nearest half hour
