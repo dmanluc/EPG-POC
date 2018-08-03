@@ -7,24 +7,47 @@
     android:layout_height="match_parent"
     tools:context=".presentation.epg.activity.EPGActivity">
 
-    <com.dmanluc.epg.presentation.widgets.EPG
+    <com.dmanluc.epg.presentation.widgets.EPGWidget
+        android:id="@+id/epg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/epgBackgroundColor"
         app:epgBackgroundColor="@color/epgBackgroundColor"
         app:epgChannelBackgroundColor="@color/epgChannelBackgroundColor"
         app:epgChannelCurrentEventBackgroundColor="@color/epgCurrentChannelEventBackgroundColor"
         app:epgChannelEventBackgroundColor="@color/epgChannelEventBackgroundColor"
         app:epgChannelEventTextColor="@color/epgChannelEventTextColor"
-        app:epgChannelEventTextSize="@dimen/textSize_epg_event_20sp"
+        app:epgChannelEventTextSize="@dimen/textSize_epg_event_14sp"
         app:epgChannelHeight="@dimen/height_epg_channel_70dp"
-        app:epgChannelMargin="@dimen/margin_epg_channel_3dp"
+        app:epgChannelMargin="@dimen/margin_epg_channel_1dp"
         app:epgChannelPadding="@dimen/padding_epg_channel_8dp"
         app:epgChannelWidth="@dimen/width_epg_channel_70dp"
         app:epgNowButtonMargin="@dimen/margin_epg_nowButton_10dp"
         app:epgNowButtonSize="@dimen/size_epg_nowButton_40dp"
-        app:epgTimeBarHeight="@dimen/height_epg_timeBar_30dp"
+        app:epgTimeBarHeight="@dimen/height_epg_timeBar_48dp"
         app:epgTimeBarLineColor="@color/epgCurrentTimeBarColor"
-        app:epgTimeBarLineWidth="@dimen/width_epg_timeBarLine_2dp"
+        app:epgTimeBarLineWidth="@dimen/width_epg_timeBarLine_1dp"
         app:epgTimeBarTextSize="@dimen/textSize_epg_timeBar_14sp"/>
+
+    <FrameLayout
+        android:id="@+id/loading_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/backgroundGreyTransparent"
+        android:clickable="false"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.wang.avi.AVLoadingIndicatorView
+            android:id="@+id/loading_indicator"
+            style="@style/AVLoadingIndicatorView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:indicatorColor="@color/epgCurrentTimeBarColor"
+            app:indicatorName="LineScaleIndicator"
+            />
+
+    </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

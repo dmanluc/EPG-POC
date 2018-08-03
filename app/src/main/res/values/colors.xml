@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#000000</color>
+    <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="epgBackgroundColor">#ff1e1e1e</color>
-    <color name="epgChannelBackgroundColor">#ff323232</color>
-    <color name="epgChannelEventBackgroundColor">#ff4f4f4f</color>
-    <color name="epgCurrentChannelEventBackgroundColor">#ff3b3b3b</color>
-    <color name="epgChannelEventTextColor">#ffd6d6d6</color>
-    <color name="epgCurrentTimeBarColor">#ffc57120</color>
+    <color name="backgroundGreyTransparent">#A5676767</color>
+
+    <color name="epgBackgroundColor">#202020</color>
+    <color name="epgChannelBackgroundColor">#202020</color>
+    <color name="epgChannelEventBackgroundColor">#111111</color>
+    <color name="epgCurrentChannelEventBackgroundColor">#545454</color>
+    <color name="epgChannelEventTextColor">#ffffff</color>
+    <color name="epgCurrentTimeBarColor">#d8a440</color>
 
 </resources>
