@@ -28,6 +28,8 @@ import com.dmanluc.epg.app.GlideApp
 import com.dmanluc.epg.app.toTimeFormat
 import com.dmanluc.epg.domain.entity.EPG
 import com.dmanluc.epg.domain.entity.Schedule
+import java.util.Calendar
+import java.util.GregorianCalendar
 import kotlin.math.min
 
 /**
@@ -38,8 +40,7 @@ import kotlin.math.min
 class EPGWidget : ViewGroup {
 
     companion object {
-        const val DAYS_BACK_IN_MILLIS: Int = 1 * 24 * 60 * 60 * 1000           // 2 days
-        const val DAYS_FORWARD_IN_MILLIS: Int = 1 * 24 * 60 * 60 * 1000        // 2 days
+        const val DAYS_MAX_HORIZONTAL_SCROLL_IN_MILLIS = 24 * 60 * 60 * 1000
         const val HOURS_TIMELINE_IN_MILLIS: Int = 1 * 60 * 60 * 1000           // 1 hour
         const val TIME_SPACING_TIMELINE_IN_MILLIS: Int = 20 * 60 * 1000        // 15 minutes
         const val TIME_SCROLL_TO_CURRENT_TIME_IN_MILLIS: Int = 500              // 500 ms
@@ -285,7 +286,7 @@ class EPGWidget : ViewGroup {
             }
         } else {
             if (!channelImageTargetCache.containsKey(imageURL)) {
-                channelImageTargetCache.put(imageURL.orEmpty(), object : Target<Bitmap> {
+                channelImageTargetCache[imageURL.orEmpty()] = object : Target<Bitmap> {
                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                         channelImageCache[imageURL.orEmpty()] = resource
                         reDraw()
@@ -322,7 +323,7 @@ class EPGWidget : ViewGroup {
 
                     override fun onDestroy() {
                     }
-                })
+                }
 
             }
 
@@ -428,8 +429,8 @@ class EPGWidget : ViewGroup {
         drawingRect.bottom = drawingRect.top + channelHeight
     }
 
-    fun drawString(canvas: Canvas, paint: Paint, str: String, x: Int, y: Int, measuringRect: Rect) {
-        val lines = str.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+    private fun drawString(canvas: Canvas, paint: Paint, str: String, x: Int, y: Int, measuringRect: Rect) {
+        val lines = str.split(regex = "\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
         var yoff = 0
 
@@ -457,12 +458,12 @@ class EPGWidget : ViewGroup {
     }
 
     private fun drawTimeBar(canvas: Canvas, drawingRect: Rect) {
-        drawingRect.left = scrollX + channelWidth
+        drawingRect.left = scrollX
         drawingRect.top = scrollY
         drawingRect.right = drawingRect.left + width
         drawingRect.bottom = drawingRect.top + timeBarHeight
 
-        clipRect.left = scrollX + channelWidth
+        clipRect.left = scrollX
         clipRect.top = scrollY
         clipRect.right = scrollX + width
         clipRect.bottom = clipRect.top + timeBarHeight
@@ -551,11 +552,17 @@ class EPGWidget : ViewGroup {
     }
 
     private fun calculatedBaseLine(): Long {
-        return System.currentTimeMillis().minus(DAYS_BACK_IN_MILLIS)
+        return GregorianCalendar().let {
+            it.set(Calendar.HOUR_OF_DAY, 0)
+            it.set(Calendar.MINUTE, 0)
+            it.set(Calendar.SECOND, 0)
+            it.set(Calendar.MILLISECOND, 0)
+            it.timeInMillis
+        }
     }
 
     private fun calculateMaxHorizontalScroll() {
-        maxHorizontalScroll = ((DAYS_BACK_IN_MILLIS + DAYS_FORWARD_IN_MILLIS - HOURS_TIMELINE_IN_MILLIS) / millisPerPixel).toInt()
+        maxHorizontalScroll = ((DAYS_MAX_HORIZONTAL_SCROLL_IN_MILLIS - HOURS_TIMELINE_IN_MILLIS) / millisPerPixel).toInt()
     }
 
     private fun calculateMaxVerticalScroll() {
