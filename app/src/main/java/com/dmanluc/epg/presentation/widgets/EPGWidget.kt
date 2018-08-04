@@ -485,6 +485,7 @@ class EPGWidget : ViewGroup {
             val time = TIME_SPACING_TIMELINE_IN_MILLIS * ((lowerTimeBound + TIME_SPACING_TIMELINE_IN_MILLIS * i + TIME_SPACING_TIMELINE_IN_MILLIS / 2) / TIME_SPACING_TIMELINE_IN_MILLIS)
 
             paint.color = channelEventTextColor
+            paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
 
             canvas.drawText(time.toTimeFormat("HH:mm"),
                             calculateHorizontalCoordinateFromTime(time).toFloat() - paint.measureText(
@@ -493,6 +494,7 @@ class EPGWidget : ViewGroup {
                             paint)
 
             paint.color = channelCurrentEventBackground
+            paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
 
             canvas.drawLine(calculateHorizontalCoordinateFromTime(time).toFloat(),
                             drawingRect.bottom - 20f,
