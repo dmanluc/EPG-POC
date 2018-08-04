@@ -7,10 +7,52 @@
     android:layout_height="match_parent"
     tools:context=".presentation.epg.activity.EPGActivity">
 
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/headerBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/black"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="@dimen/margin_activity_16dp"
+        android:paddingEnd="@dimen/margin_activity_16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/epg">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:srcCompat="@drawable/ic_profile"/>
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_company_logo"/>
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:srcCompat="@drawable/ic_search"/>
+
+    </android.support.constraint.ConstraintLayout>
+
     <com.dmanluc.epg.presentation.widgets.EPGWidget
         android:id="@+id/epg"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:background="@color/epgBackgroundColor"
         app:epgBackgroundColor="@color/epgBackgroundColor"
         app:epgChannelBackgroundColor="@color/epgChannelBackgroundColor"
@@ -27,15 +69,21 @@
         app:epgTimeBarHeight="@dimen/height_epg_timeBar_48dp"
         app:epgTimeBarLineColor="@color/epgCurrentTimeBarColor"
         app:epgTimeBarLineWidth="@dimen/width_epg_timeBarLine_1dp"
-        app:epgTimeBarTextSize="@dimen/textSize_epg_timeBar_14sp"/>
+        app:epgTimeBarTextSize="@dimen/textSize_epg_timeBar_14sp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintTop_toBottomOf="@id/headerBar"/>
 
     <FrameLayout
         android:id="@+id/loading_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:background="@color/backgroundGreyTransparent"
         android:clickable="false"
         android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible">
 
         <com.wang.avi.AVLoadingIndicatorView
@@ -49,5 +97,16 @@
             />
 
     </FrameLayout>
+
+    <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:itemBackground="@color/epgChannelBackgroundColor"
+        app:itemIconTint="@color/bottom_navigation_color_state"
+        app:itemTextColor="@color/epgCurrentTimeBarColor"
+        app:layout_constraintTop_toBottomOf="@id/epg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/bottom_navigation_menu"/>
 
 </android.support.constraint.ConstraintLayout>

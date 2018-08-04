@@ -38,7 +38,7 @@ abstract class BaseActivity<in V : BaseView, out P : Presenter<V>> : AppCompatAc
         super.onCreate(savedInstanceState)
         provideDaggerDependency()
         setContentView(layoutId)
-        if (showToolbar) setActionBar(screenTitle, showBackArrow())
+        setActionBar(screenTitle, showBackArrow(), showToolbar)
         disableTouchLoadingView()
         presenter.attachView(this as V)
         presenter.recoverState(savedInstanceState)
@@ -74,13 +74,13 @@ abstract class BaseActivity<in V : BaseView, out P : Presenter<V>> : AppCompatAc
 
     protected abstract fun showBackArrow(): Boolean
 
-    open fun setActionBar(heading: String?, enableBackArrow: Boolean) {
+    open fun setActionBar(heading: String?, enableBackArrow: Boolean, show: Boolean) {
         supportActionBar?.apply {
             displayOptions = ActionBar.DISPLAY_SHOW_TITLE
             title = heading.orEmpty()
             setDisplayHomeAsUpEnabled(enableBackArrow)
             setDisplayShowHomeEnabled(enableBackArrow)
-            show()
+            if (show) show() else hide()
         }
     }
 

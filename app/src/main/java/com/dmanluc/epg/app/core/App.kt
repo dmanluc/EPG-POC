@@ -2,6 +2,7 @@ package com.dmanluc.epg.app.core
 
 import android.app.Application
 import android.content.Context
+import android.support.v7.app.AppCompatDelegate
 import com.dmanluc.epg.BuildConfig
 import com.dmanluc.epg.app.di.component.AppComponent
 import com.dmanluc.epg.app.di.component.DaggerAppComponent
@@ -22,6 +23,7 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         initDagger()
     }
 

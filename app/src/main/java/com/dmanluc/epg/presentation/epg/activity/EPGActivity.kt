@@ -1,9 +1,11 @@
 package com.dmanluc.epg.presentation.epg.activity
 
+import android.os.Bundle
 import com.dmanluc.epg.R
 import com.dmanluc.epg.app.di.component.DaggerEPGActivityComponent
 import com.dmanluc.epg.domain.entity.EPG
 import com.dmanluc.epg.presentation.base.BaseActivity
+import kotlinx.android.synthetic.main.activity_epg.bottomNavigation
 import kotlinx.android.synthetic.main.activity_epg.epg
 import javax.inject.Inject
 
@@ -27,6 +29,16 @@ class EPGActivity : BaseActivity<EPGView, EPGPresenterImpl>(), EPGView {
         DaggerEPGActivityComponent.builder()
                 .appComponent(appComponent)
                 .build().inject(this)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        bottomNavigation.apply {
+            setTextVisibility(false)
+            enableAnimation(false)
+            enableItemShiftingMode(false)
+            enableShiftingMode(false)
+        }
     }
 
     override fun onStart() {
