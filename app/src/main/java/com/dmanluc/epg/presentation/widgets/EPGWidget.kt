@@ -42,8 +42,8 @@ class EPGWidget : ViewGroup {
     companion object {
         const val DAYS_MAX_HORIZONTAL_SCROLL_IN_MILLIS = 24 * 60 * 60 * 1000
         const val HOURS_TIMELINE_IN_MILLIS: Int = 1 * 60 * 60 * 1000           // 1 hour
-        const val TIME_SPACING_TIMELINE_IN_MILLIS: Int = 20 * 60 * 1000        // 15 minutes
-        const val TIME_SCROLL_TO_CURRENT_TIME_IN_MILLIS: Int = 500              // 500 ms
+        const val TIME_SPACING_TIMELINE_IN_MILLIS: Int = 15 * 60 * 1000        // 15 minutes
+        const val TIME_SCROLL_TO_CURRENT_TIME_IN_MILLIS: Int = 500             // 500 ms
     }
 
     private var epgData: EPG? = null
