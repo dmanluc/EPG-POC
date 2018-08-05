@@ -212,7 +212,7 @@ class EPGWidget : ViewGroup {
                     drawTimeBar(it, drawingRect)
                     drawWeekDayBar(it, drawingRect)
                     drawTimeLine(it, drawingRect)
-                    drawNowButton(it, drawingRect)
+                    drawNowButton(it)
                     drawStarItem(it, drawingRect)
                 }
 
@@ -220,10 +220,7 @@ class EPGWidget : ViewGroup {
                     scrollTo(scroller.currX, scroller.currY)
                 }
             }
-
-
         }
-
     }
 
     override fun onDetachedFromWindow() {
@@ -473,7 +470,6 @@ class EPGWidget : ViewGroup {
         drawingRect.right = drawingRect.left + width
         drawingRect.bottom = drawingRect.top + channelMargin
 
-        // Bottom stroke
         paint.color = channelCurrentEventBackground
         canvas.drawRect(drawingRect, paint)
     }
@@ -484,11 +480,9 @@ class EPGWidget : ViewGroup {
         drawingRect.right = drawingRect.left + width
         drawingRect.bottom = drawingRect.top + timeBarHeight
 
-        // Background
         paint.color = channelBackground
         canvas.drawRect(drawingRect, paint)
 
-        // Time stamps
         paint.color = channelEventTextColor
         paint.textSize = timeBarTextSize.toFloat()
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
@@ -524,11 +518,9 @@ class EPGWidget : ViewGroup {
         drawingRect.right = drawingRect.left + width
         drawingRect.bottom = drawingRect.top + weekDayBarHeight
 
-        // Background
         paint.color = channelBackground
         canvas.drawRect(drawingRect, paint)
 
-        // Text
         paint.color = channelEventTextColor
         paint.textSize = 36.toFloat()
         paint.typeface = Typeface.create(SANS_SERIF, BOLD)
@@ -563,7 +555,6 @@ class EPGWidget : ViewGroup {
         drawingRect.right = drawingRect.left + width
         drawingRect.bottom = drawingRect.top + channelMargin
 
-        // Bottom stroke
         paint.color = channelCurrentEventBackground
         canvas.drawRect(drawingRect, paint)
     }
@@ -631,16 +622,14 @@ class EPGWidget : ViewGroup {
         }
     }
 
-    private fun drawNowButton(canvas: Canvas, drawingRect: Rect) {
-        var newDrawingRect = drawingRect
+    private fun drawNowButton(canvas: Canvas) {
         if (shouldNowButtonBeVisible()) {
-            newDrawingRect = calculateNowButtonClickArea()
+            val newDrawingRect = calculateNowButtonClickArea()
 
             paint.color = timeBarLineColor
             canvas.drawRoundRect(RectF(newDrawingRect), 12f, 12f, paint)
 
             paint.color = channelEventTextColor
-            paint.typeface = Typeface.DEFAULT
             paint.typeface = Typeface.DEFAULT_BOLD
 
             val textBounds = Rect()
@@ -654,7 +643,8 @@ class EPGWidget : ViewGroup {
         }
     }
 
-    private fun shouldNowButtonBeVisible() = abs(calculateHorizontalCoordinateAtHalfTimeLine() - scrollX) > (width / 3).toLong()
+    private fun shouldNowButtonBeVisible() = abs(
+            calculateHorizontalCoordinateAtHalfTimeLine() - scrollX) > (width / 3).toLong()
 
     private fun calculateMillisPerPixel(): Long {
         return (HOURS_TIMELINE_IN_MILLIS / (resources.displayMetrics.widthPixels - channelWidth - channelMargin)).toLong()
@@ -694,7 +684,8 @@ class EPGWidget : ViewGroup {
     }
 
     private fun calculateHorizontalCoordinateAtHalfTimeLine(): Int {
-        return calculateHorizontalCoordinateFromTime(System.currentTimeMillis() - (HOURS_TIMELINE_IN_MILLIS / 2))
+        return calculateHorizontalCoordinateFromTime(
+                System.currentTimeMillis() - (HOURS_TIMELINE_IN_MILLIS / 2) - ((channelWidth + 2 * channelMargin) * millisPerPixel))
     }
 
     private fun shouldTimeLineUpdate(currentTimeInMillis: Long): Boolean {
@@ -746,6 +737,7 @@ class EPGWidget : ViewGroup {
         val calendar = Calendar.getInstance().apply {
             add(Calendar.DATE, -((numberOfDaysToShow - 1) / 2))
         }
+
         val weekDays = mutableListOf<Pair<String, Boolean>>()
         val decimalFormat = DecimalFormat("00")
 
@@ -774,12 +766,9 @@ class EPGWidget : ViewGroup {
             val scrollX = scrollX + x
             val scrollY = scrollY + y
 
-            val channelPosition = getChannelPosition(scrollY)
-            if (channelPosition != -1) {
-                epgClickListener?.let {
-                    if (calculateNowButtonClickArea().contains(scrollX, scrollY) && shouldNowButtonBeVisible()) {
-                        it.onNowButtonClicked()
-                    }
+            epgClickListener?.let {
+                if (calculateNowButtonClickArea().contains(scrollX, scrollY) && shouldNowButtonBeVisible()) {
+                    it.onNowButtonClicked()
                 }
             }
             //            val channelPosition = getChannelPosition(scrollY)
@@ -810,7 +799,6 @@ class EPGWidget : ViewGroup {
             var dy = distanceY.toInt()
             val x = scrollX
             val y = scrollY
-
 
             // Avoid over scrolling
             if (x + dx < 0) {
