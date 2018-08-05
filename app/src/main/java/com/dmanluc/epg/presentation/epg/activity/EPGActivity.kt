@@ -41,6 +41,7 @@ class EPGActivity : BaseActivity<EPGView, EPGPresenterImpl>(), EPGView {
             enableAnimation(false)
             enableItemShiftingMode(false)
             enableShiftingMode(false)
+            selectedItemId = R.id.itemMenuEpg
         }
         presenter.fetchEPGData()
     }
