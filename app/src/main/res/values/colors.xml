@@ -9,8 +9,9 @@
     <color name="epgBackgroundColor">#202020</color>
     <color name="epgChannelBackgroundColor">#202020</color>
     <color name="epgChannelEventBackgroundColor">#111111</color>
-    <color name="epgCurrentChannelEventBackgroundColor">#545454</color>
-    <color name="epgChannelEventTextColor">#ffffff</color>
+    <color name="epgCurrentChannelEventBackgroundColor">#393939</color>
+    <color name="epgChannelEventTitleColor">#ffffff</color>
+    <color name="epgChannelEventScheduleColor">#909090</color>
     <color name="epgCurrentTimeBarColor">#d8a440</color>
 
 </resources>

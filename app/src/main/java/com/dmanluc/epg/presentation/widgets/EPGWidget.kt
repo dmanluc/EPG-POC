@@ -89,7 +89,8 @@ class EPGWidget : ViewGroup {
     private var channelBackground: Int = 0
     private var channelEventBackground: Int = 0
     private var channelCurrentEventBackground: Int = 0
-    private var channelEventTextColor: Int = 0
+    private var channelEventTitleColor: Int = 0
+    private var channelEventScheduleColor: Int = 0
     private var channelEventTextSize: Int = 0
     private var timeBarLineWidth: Int = 0
     private var timeBarLineColor: Int = 0
@@ -141,8 +142,10 @@ class EPGWidget : ViewGroup {
                 channelCurrentEventBackground = getColor(R.styleable.EPG_epgChannelCurrentEventBackgroundColor,
                                                          ContextCompat.getColor(context,
                                                                                 R.color.epgCurrentChannelEventBackgroundColor))
-                channelEventTextColor = getColor(R.styleable.EPG_epgChannelEventTextColor,
-                                                 ContextCompat.getColor(context, R.color.epgChannelEventTextColor))
+                channelEventTitleColor = getColor(R.styleable.EPG_epgChannelEventTitleColor,
+                                                  ContextCompat.getColor(context, R.color.epgChannelEventTitleColor))
+                channelEventScheduleColor = getColor(R.styleable.EPG_epgChannelEventScheduleColor,
+                                                     ContextCompat.getColor(context, R.color.epgChannelEventScheduleColor))
                 channelEventTextSize = getDimensionPixelSize(R.styleable.EPG_epgChannelEventTextSize,
                                                              resources.getDimensionPixelSize(
                                                                      R.dimen.textSize_epg_event_14sp))
@@ -289,6 +292,7 @@ class EPGWidget : ViewGroup {
 
         for (pos in firstPosition..lastPosition) {
             drawChannelItem(canvas, pos)
+            drawChannelItemsBottomStroke(pos, canvas, drawingRect)
         }
 
         drawChannelItemsRightStroke(canvas, drawingRect)
@@ -423,17 +427,13 @@ class EPGWidget : ViewGroup {
     private fun drawEvent(canvas: Canvas, channelPosition: Int, schedule: Schedule, drawingRect: Rect) {
         setEventDrawingRectangle(channelPosition, schedule.startTime, schedule.endTime, drawingRect)
 
-        // Background
         paint.color = if (schedule.isLive()) channelCurrentEventBackground else channelEventBackground
         canvas.drawRect(drawingRect, paint)
 
-        // Add left and right inner padding
         drawingRect.left += channelPadding
         drawingRect.right -= channelPadding
 
-        // Text
         paint.isAntiAlias = true
-        paint.color = channelEventTextColor
         paint.textSize = channelEventTextSize.toFloat()
 
         val title = "${schedule.title}\n${schedule.timeInPrettyFormat}"
@@ -442,9 +442,9 @@ class EPGWidget : ViewGroup {
 
     private fun setEventDrawingRectangle(channelPosition: Int, start: Long, end: Long, drawingRect: Rect) {
         drawingRect.left = calculateHorizontalCoordinateFromTime(start)
-        drawingRect.top = calculateVerticalCoordinateFromChannelPosition(channelPosition)
+        drawingRect.top = calculateVerticalCoordinateFromChannelPosition(channelPosition) + channelMargin
         drawingRect.right = calculateHorizontalCoordinateFromTime(end) - channelMargin
-        drawingRect.bottom = drawingRect.top + channelHeight
+        drawingRect.bottom = drawingRect.top + channelHeight + channelMargin
     }
 
     private fun drawString(canvas: Canvas, paint: Paint, str: String, x: Int, y: Int, measuringRect: Rect) {
@@ -454,9 +454,11 @@ class EPGWidget : ViewGroup {
 
         for (i in lines.indices) {
             if (i == 1) {
-                paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)
+                paint.typeface = Typeface.DEFAULT
+                paint.color = channelEventScheduleColor
             } else {
-                paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+                paint.typeface = Typeface.DEFAULT_BOLD
+                paint.color = channelEventTitleColor
             }
             canvas.drawText(lines[i], x.toFloat(), (y + yoff).toFloat(), paint)
             paint.getTextBounds(lines[i], 0, lines[i].length, measuringRect)
@@ -483,14 +485,14 @@ class EPGWidget : ViewGroup {
         paint.color = channelBackground
         canvas.drawRect(drawingRect, paint)
 
-        paint.color = channelEventTextColor
+        paint.color = channelEventTitleColor
         paint.textSize = timeBarTextSize.toFloat()
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
 
         for (i in 0..HOURS_TIMELINE_IN_MILLIS / TIME_SPACING_TIMELINE_IN_MILLIS) {
             val time = TIME_SPACING_TIMELINE_IN_MILLIS * ((lowerTimeBound + TIME_SPACING_TIMELINE_IN_MILLIS * i) / TIME_SPACING_TIMELINE_IN_MILLIS)
 
-            paint.color = channelEventTextColor
+            paint.color = channelEventTitleColor
             paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
 
             canvas.drawText(time.toTimeFormat("HH:mm"),
@@ -521,7 +523,7 @@ class EPGWidget : ViewGroup {
         paint.color = channelBackground
         canvas.drawRect(drawingRect, paint)
 
-        paint.color = channelEventTextColor
+        paint.color = channelEventTitleColor
         paint.textSize = 36.toFloat()
         paint.typeface = Typeface.create(SANS_SERIF, BOLD)
 
@@ -541,7 +543,7 @@ class EPGWidget : ViewGroup {
                                    itemWidth: Float, canvas: Canvas) {
         val newDrawingRect = drawingRect
 
-        if (isCurrentDay) paint.color = timeBarLineColor else paint.color = channelEventTextColor
+        if (isCurrentDay) paint.color = channelEventTitleColor else paint.color = channelCurrentEventBackground
 
         canvas.drawMultilineText(weekDayString, TextPaint(paint), itemWidth.toInt(),
                                  (newDrawingRect.left + channelPadding + (itemWidth * index)),
@@ -602,6 +604,16 @@ class EPGWidget : ViewGroup {
         canvas.drawRect(drawingRect, paint)
     }
 
+    private fun drawChannelItemsBottomStroke(channelPosition: Int, canvas: Canvas, drawingRect: Rect) {
+        drawingRect.left = scrollX
+        drawingRect.top = calculateVerticalCoordinateFromChannelPosition(channelPosition)
+        drawingRect.right = drawingRect.left + channelWidth
+        drawingRect.bottom = drawingRect.top + channelMargin
+
+        paint.color = channelCurrentEventBackground
+        canvas.drawRect(drawingRect, paint)
+    }
+
     private fun drawTimeLine(canvas: Canvas, drawingRect: Rect) {
         val now = System.currentTimeMillis()
 
@@ -629,7 +641,7 @@ class EPGWidget : ViewGroup {
             paint.color = timeBarLineColor
             canvas.drawRoundRect(RectF(newDrawingRect), 12f, 12f, paint)
 
-            paint.color = channelEventTextColor
+            paint.color = channelEventTitleColor
             paint.typeface = Typeface.DEFAULT_BOLD
 
             val textBounds = Rect()
@@ -684,8 +696,14 @@ class EPGWidget : ViewGroup {
     }
 
     private fun calculateHorizontalCoordinateAtHalfTimeLine(): Int {
-        return calculateHorizontalCoordinateFromTime(
+        val coordinate = calculateHorizontalCoordinateFromTime(
                 System.currentTimeMillis() - (HOURS_TIMELINE_IN_MILLIS / 2) - ((channelWidth + 2 * channelMargin) * millisPerPixel))
+        val coordinateLimit = calculateHorizontalCoordinateFromTime(timeOffset)
+        return if (coordinateLimit >= coordinate) {
+            coordinateLimit - channelWidth - channelMargin
+        } else {
+            coordinate
+        }
     }
 
     private fun shouldTimeLineUpdate(currentTimeInMillis: Long): Boolean {

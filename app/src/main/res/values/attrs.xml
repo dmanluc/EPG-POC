@@ -10,7 +10,8 @@
         <attr name="epgChannelBackgroundColor" format="color"/>
         <attr name="epgChannelEventBackgroundColor" format="color"/>
         <attr name="epgChannelCurrentEventBackgroundColor" format="color"/>
-        <attr name="epgChannelEventTextColor" format="color"/>
+        <attr name="epgChannelEventTitleColor" format="color"/>
+        <attr name="epgChannelEventScheduleColor" format="color"/>
         <attr name="epgChannelEventTextSize" format="dimension"/>
         <attr name="epgTimeBarHeight" format="dimension"/>
         <attr name="epgTimeBarTextSize" format="dimension"/>
