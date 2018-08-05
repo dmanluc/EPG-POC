@@ -2,21 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/itemMenuHome"
         android:enabled="true"
         android:icon="@drawable/ic_home"
         android:title=""
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/itemMenuTvProgramme"
         android:enabled="true"
         android:icon="@drawable/ic_tv_programme"
         android:title=""
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/itemMenuEpg"
         android:enabled="true"
         android:icon="@drawable/ic_epg_menu"
         android:title=""
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/itemMenuReplay"
         android:enabled="true"
         android:icon="@drawable/ic_replay"
         android:title=""

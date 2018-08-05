@@ -6,12 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.graphics.Typeface.BOLD
+import android.graphics.Typeface.DEFAULT
+import android.graphics.Typeface.SANS_SERIF
 import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import android.text.Layout
@@ -29,12 +31,15 @@ import com.bumptech.glide.request.transition.Transition
 import com.dmanluc.epg.R
 import com.dmanluc.epg.app.GlideApp
 import com.dmanluc.epg.app.drawMultilineText
+import com.dmanluc.epg.app.px
 import com.dmanluc.epg.app.toTimeFormat
 import com.dmanluc.epg.domain.entity.Channel
 import com.dmanluc.epg.domain.entity.EPG
 import com.dmanluc.epg.domain.entity.Schedule
+import java.text.DecimalFormat
 import java.util.Calendar
 import java.util.GregorianCalendar
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -51,6 +56,8 @@ class EPGWidget : ViewGroup {
         const val TIME_SPACING_TIMELINE_IN_MILLIS: Int = 15 * 60 * 1000        // 15 minutes
         const val TIME_SCROLL_TO_CURRENT_TIME_IN_MILLIS: Int = 1000             // 500 ms
         const val HEIGHT_WEEKDAY_BAR_DP = 48
+        const val HEIGHT_NOW_BUTTON_DP = 40
+        const val WIDTH_NOW_BUTTON_DP = 64
     }
 
     private var epgData: EPG? = null
@@ -88,8 +95,10 @@ class EPGWidget : ViewGroup {
     private var timeBarLineColor: Int = 0
     private var timeBarHeight: Int = 0
     private var timeBarTextSize: Int = 0
-    private var nowButtonSize: Int = 0
     private var nowButtonMargin: Int = 0
+    private var nowButtonText: String = ""
+    private var nowButtonHeight: Int = 0
+    private var nowButtonWidth: Int = 0
     private var weekDayBarHeight: Int = 0
 
     private var maxHorizontalScroll: Int = 0
@@ -145,11 +154,15 @@ class EPGWidget : ViewGroup {
                                             ContextCompat.getColor(context, R.color.epgCurrentTimeBarColor))
                 timeBarTextSize = getResourceId(R.styleable.EPG_epgTimeBarTextSize,
                                                 resources.getDimensionPixelSize(R.dimen.textSize_epg_timeBar_14sp))
-                nowButtonSize = getDimensionPixelSize(R.styleable.EPG_epgNowButtonSize,
-                                                      resources.getDimensionPixelSize(R.dimen.size_epg_nowButton_52dp))
                 nowButtonMargin = getDimensionPixelSize(R.styleable.EPG_epgNowButtonMargin,
                                                         resources.getDimensionPixelSize(
                                                                 R.dimen.margin_epg_nowButton_16dp))
+                nowButtonText = resources.getString(
+                        getResourceId(R.styleable.EPG_epgNowButtonText, R.string.now_button_text))
+
+                nowButtonHeight = HEIGHT_NOW_BUTTON_DP.px()
+                nowButtonWidth = WIDTH_NOW_BUTTON_DP.px()
+
                 weekDayBarHeight = getDimensionPixelSize(HEIGHT_WEEKDAY_BAR_DP, resources.getDimensionPixelSize(
                         R.dimen.height_epg_timeBar_48dp))
             }
@@ -161,10 +174,6 @@ class EPGWidget : ViewGroup {
         scroller.setFriction(.2f)
 
         gestureDetector = GestureDetector(context, OnGestureListener())
-
-        val bitmapOptions = BitmapFactory.Options()
-        bitmapOptions.outWidth = nowButtonSize
-        bitmapOptions.outHeight = nowButtonSize
 
         initializeBoundaries()
         initializeMinuteTickChangeBroadcastReceiver(context)
@@ -204,6 +213,7 @@ class EPGWidget : ViewGroup {
                     drawWeekDayBar(it, drawingRect)
                     drawTimeLine(it, drawingRect)
                     drawNowButton(it, drawingRect)
+                    drawStarItem(it, drawingRect)
                 }
 
                 if (scroller.computeScrollOffset()) {
@@ -284,7 +294,7 @@ class EPGWidget : ViewGroup {
             drawChannelItem(canvas, pos)
         }
 
-        drawChannelItemsRightStrokeBottomStroke(canvas, drawingRect)
+        drawChannelItemsRightStroke(canvas, drawingRect)
     }
 
     private fun drawChannelItem(canvas: Canvas, position: Int) {
@@ -505,7 +515,6 @@ class EPGWidget : ViewGroup {
 
         }
 
-        //drawTimebarDayIndicator(canvas, drawingRect)
         drawTimeBarBottomStroke(canvas, drawingRect)
     }
 
@@ -521,10 +530,31 @@ class EPGWidget : ViewGroup {
 
         // Text
         paint.color = channelEventTextColor
-        paint.textSize = timeBarTextSize.toFloat()
-        //canvas.drawMultilineText()
+        paint.textSize = 36.toFloat()
+        paint.typeface = Typeface.create(SANS_SERIF, BOLD)
 
+        val days = calculateCurrentWeekDaysInPrettyFormat()
+
+        val itemWidth = (days.map { paint.measureText(it.first) }.min() ?: 0f) + channelPadding / 2
+
+        days.mapIndexed { index, weekDayString ->
+            drawWeekDayBarItem(weekDayString.first, weekDayString.second, index, drawingRect, itemWidth, canvas)
+        }
+
+        paint.typeface = DEFAULT
         drawWeekDayBarBottomStroke(canvas, drawingRect)
+    }
+
+    private fun drawWeekDayBarItem(weekDayString: String, isCurrentDay: Boolean, index: Int, drawingRect: Rect,
+                                   itemWidth: Float, canvas: Canvas) {
+        val newDrawingRect = drawingRect
+
+        if (isCurrentDay) paint.color = timeBarLineColor else paint.color = channelEventTextColor
+
+        canvas.drawMultilineText(weekDayString, TextPaint(paint), itemWidth.toInt(),
+                                 (newDrawingRect.left + channelPadding + (itemWidth * index)),
+                                 newDrawingRect.top.toFloat() + weekDayBarHeight / 5,
+                                 alignment = Layout.Alignment.ALIGN_CENTER)
     }
 
     private fun drawWeekDayBarBottomStroke(canvas: Canvas, drawingRect: Rect) {
@@ -538,13 +568,45 @@ class EPGWidget : ViewGroup {
         canvas.drawRect(drawingRect, paint)
     }
 
-    private fun drawChannelItemsRightStrokeBottomStroke(canvas: Canvas, drawingRect: Rect) {
+    private fun drawStarItem(canvas: Canvas, drawingRect: Rect) {
+        drawingRect.left = scrollX
+        drawingRect.top = scrollY
+        drawingRect.right = drawingRect.left + channelWidth
+        drawingRect.bottom = drawingRect.top + weekDayBarHeight - channelMargin
+
+        val starDrawable = ContextCompat.getDrawable(context, R.drawable.ic_star)
+
+        paint.color = channelBackground
+        canvas.drawRect(drawingRect, paint)
+
+        val drawableRect = drawingRect
+        drawableRect.left += (2.75 * channelPadding).toInt()
+        drawableRect.top += (1.25 * channelPadding).toInt()
+        drawableRect.right -= (2.75 * channelPadding).toInt()
+        drawableRect.bottom -= (1.25 * channelPadding).toInt()
+
+        starDrawable?.setBounds(drawableRect.left, drawableRect.top, drawableRect.right, drawableRect.bottom)
+        starDrawable?.draw(canvas)
+
+        drawStarItemRightStroke(canvas, drawingRect)
+    }
+
+    private fun drawStarItemRightStroke(canvas: Canvas, drawingRect: Rect) {
+        drawingRect.left = scrollX + channelWidth
+        drawingRect.top = scrollY
+        drawingRect.right = drawingRect.left + channelMargin
+        drawingRect.bottom = weekDayBarHeight + scrollY
+
+        paint.color = channelCurrentEventBackground
+        canvas.drawRect(drawingRect, paint)
+    }
+
+    private fun drawChannelItemsRightStroke(canvas: Canvas, drawingRect: Rect) {
         drawingRect.left = scrollX + channelWidth
         drawingRect.top = scrollY + weekDayBarHeight + timeBarHeight
         drawingRect.right = drawingRect.left + channelMargin
         drawingRect.bottom = height + scrollY
 
-        // Bottom stroke
         paint.color = channelCurrentEventBackground
         canvas.drawRect(drawingRect, paint)
     }
@@ -577,21 +639,22 @@ class EPGWidget : ViewGroup {
             paint.color = timeBarLineColor
             canvas.drawRoundRect(RectF(newDrawingRect), 12f, 12f, paint)
 
-            // TODO Get string from view attrs
             paint.color = channelEventTextColor
             paint.typeface = Typeface.DEFAULT
             paint.typeface = Typeface.DEFAULT_BOLD
 
-            canvas.drawMultilineText("NOW", TextPaint(paint), newDrawingRect.right - newDrawingRect.left,
+            val textBounds = Rect()
+            paint.getTextBounds(nowButtonText, 0, nowButtonText.length - 1, textBounds)
+            canvas.drawMultilineText(nowButtonText,
+                                     TextPaint(paint),
+                                     newDrawingRect.right - newDrawingRect.left,
                                      newDrawingRect.left.toFloat(),
-                                     newDrawingRect.top.toFloat() + ((newDrawingRect.bottom - newDrawingRect.top) / 3),
+                                     newDrawingRect.top.toFloat() + ((newDrawingRect.height() - 2 * textBounds.height()) / 2),
                                      alignment = Layout.Alignment.ALIGN_CENTER)
         }
     }
 
-    private fun shouldNowButtonBeVisible() = abs(
-            calculateHorizontalCoordinateAtHalfTimeLine() - scrollX) > (width / 3).toLong()
-
+    private fun shouldNowButtonBeVisible() = abs(calculateHorizontalCoordinateAtHalfTimeLine() - scrollX) > (width / 3).toLong()
 
     private fun calculateMillisPerPixel(): Long {
         return (HOURS_TIMELINE_IN_MILLIS / (resources.displayMetrics.widthPixels - channelWidth - channelMargin)).toLong()
@@ -668,11 +731,35 @@ class EPGWidget : ViewGroup {
     }
 
     private fun calculateNowButtonClickArea(): Rect {
-        measuringRect.left = scrollX + width - nowButtonSize - nowButtonMargin
-        measuringRect.top = scrollY + height - nowButtonSize - nowButtonMargin
-        measuringRect.right = measuringRect.left + nowButtonSize
-        measuringRect.bottom = measuringRect.top + nowButtonSize
+        measuringRect.left = scrollX + width - nowButtonWidth - nowButtonMargin
+        measuringRect.top = scrollY + height - nowButtonHeight - nowButtonMargin
+        measuringRect.right = measuringRect.left + nowButtonWidth
+        measuringRect.bottom = measuringRect.top + nowButtonHeight
         return measuringRect
+    }
+
+    private fun calculateCurrentWeekDaysInPrettyFormat(): List<Pair<String, Boolean>> {
+        val numberOfDaysToShow = 5
+
+        val centralElement = (numberOfDaysToShow - 1) / 2
+
+        val calendar = Calendar.getInstance().apply {
+            add(Calendar.DATE, -((numberOfDaysToShow - 1) / 2))
+        }
+        val weekDays = mutableListOf<Pair<String, Boolean>>()
+        val decimalFormat = DecimalFormat("00")
+
+        with(calendar) {
+            for (dayIndexInWeek in 0 until numberOfDaysToShow) {
+                weekDays.add(dayIndexInWeek,
+                             Pair(getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.UK).capitalize()
+                                  + "\n" + decimalFormat.format(get(Calendar.DAY_OF_MONTH)) + ".${decimalFormat.format(
+                                     get(Calendar.MONTH))}.", dayIndexInWeek == centralElement))
+                add(Calendar.DATE, 1)
+            }
+        }
+
+        return weekDays
     }
 
     private inner class OnGestureListener : GestureDetector.SimpleOnGestureListener() {

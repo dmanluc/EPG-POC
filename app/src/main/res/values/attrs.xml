@@ -16,8 +16,8 @@
         <attr name="epgTimeBarTextSize" format="dimension"/>
         <attr name="epgTimeBarLineWidth" format="dimension"/>
         <attr name="epgTimeBarLineColor" format="color"/>
-        <attr name="epgNowButtonSize" format="dimension"/>
         <attr name="epgNowButtonMargin" format="dimension"/>
+        <attr name="epgNowButtonText" format="string"/>
     </declare-styleable>
 
 </resources>

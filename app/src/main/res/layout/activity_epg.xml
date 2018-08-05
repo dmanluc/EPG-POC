@@ -65,7 +65,7 @@
         app:epgChannelPadding="@dimen/padding_epg_channel_8dp"
         app:epgChannelWidth="@dimen/width_epg_channel_70dp"
         app:epgNowButtonMargin="@dimen/margin_epg_nowButton_16dp"
-        app:epgNowButtonSize="@dimen/size_epg_nowButton_52dp"
+        app:epgNowButtonText="@string/now_button_text"
         app:epgTimeBarHeight="@dimen/height_epg_timeBar_48dp"
         app:epgTimeBarLineColor="@color/epgCurrentTimeBarColor"
         app:epgTimeBarLineWidth="@dimen/width_epg_timeBarLine_1dp"

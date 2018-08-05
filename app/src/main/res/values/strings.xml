@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">EPG</string>
+    <string name="now_button_text">NOW</string>
 </resources>
