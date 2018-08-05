@@ -527,7 +527,7 @@ class EPGWidget : ViewGroup {
 
         val days = calculateCurrentWeekDaysInPrettyFormat()
 
-        val itemWidth = (days.map { paint.measureText(it.first) }.min() ?: 0f) + channelPadding / 2
+        val itemWidth = (days.map { paint.measureText(it.first) }.min() ?: 0f)
 
         days.mapIndexed { index, weekDayString ->
             drawWeekDayBarItem(weekDayString.first, weekDayString.second, index, drawingRect, itemWidth, canvas)
