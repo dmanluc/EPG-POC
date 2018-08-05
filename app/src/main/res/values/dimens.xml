@@ -12,7 +12,7 @@
     <dimen name="height_epg_timeBar_48dp">48dp</dimen>
     <dimen name="textSize_epg_timeBar_14sp">14sp</dimen>
     <dimen name="width_epg_timeBarLine_1dp">1dp</dimen>
-    <dimen name="size_epg_nowButton_40dp">40dp</dimen>
-    <dimen name="margin_epg_nowButton_10dp">10dp</dimen>
+    <dimen name="size_epg_nowButton_52dp">52dp</dimen>
+    <dimen name="margin_epg_nowButton_16dp">16dp</dimen>
 
 </resources>
