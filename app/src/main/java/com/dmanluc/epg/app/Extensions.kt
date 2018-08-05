@@ -1,5 +1,6 @@
 package com.dmanluc.epg.app
 
+import android.content.res.Resources
 import android.graphics.Canvas
 import android.os.Build
 import android.support.annotation.RequiresApi
@@ -176,6 +177,10 @@ inline fun Canvas.withTranslation(
         restoreToCount(checkpoint)
     }
 }
+
+fun Int.dp() = (this / Resources.getSystem().displayMetrics.density).toInt()
+
+fun Int.px() = (this * Resources.getSystem().displayMetrics.density).toInt()
 
 private object StaticLayoutCache {
 
