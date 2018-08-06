@@ -14,6 +14,8 @@ interface EPGView: BaseView {
 
     fun handleRefreshButton(enable: Boolean)
 
+    fun showErrorMessage(message: String?)
+
     fun showLoadingProgress()
 
     fun hideLoadingProgress()

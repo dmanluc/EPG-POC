@@ -3,6 +3,7 @@ package com.dmanluc.epg.presentation.ui.epg.activity
 import android.os.Bundle
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.Toast
 import com.dmanluc.epg.R
 import com.dmanluc.epg.app.di.component.DaggerEPGActivityComponent
 import com.dmanluc.epg.domain.entity.Channel
@@ -15,8 +16,7 @@ import kotlinx.android.synthetic.main.activity_epg.epg
 import kotlinx.android.synthetic.main.activity_epg.refreshButton
 import javax.inject.Inject
 
-class EPGActivity : BaseActivity<EPGView, EPGPresenterImpl>(),
-                    EPGView {
+class EPGActivity : BaseActivity<EPGView, EPGPresenterImpl>(), EPGView {
 
     @Inject
     lateinit var internalPresenter: EPGPresenterImpl
@@ -52,6 +52,10 @@ class EPGActivity : BaseActivity<EPGView, EPGPresenterImpl>(),
 
     override fun handleRefreshButton(enable: Boolean) {
         refreshButton.visibility = if (enable) VISIBLE else GONE
+    }
+
+    override fun showErrorMessage(message: String?) {
+        Toast.makeText(this, message.orEmpty(), Toast.LENGTH_LONG).show()
     }
 
     override fun showLoadingProgress() {

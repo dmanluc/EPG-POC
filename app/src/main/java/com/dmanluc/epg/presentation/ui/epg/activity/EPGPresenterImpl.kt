@@ -28,6 +28,7 @@ class EPGPresenterImpl @Inject constructor(private val getEpgDataUseCase: GetEPG
                 super.onErrorMessage(errorMessage)
                 view?.hideLoadingProgress()
                 view?.handleRefreshButton(true)
+                view?.showErrorMessage(errorMessage)
             }
         }, null)
     }
