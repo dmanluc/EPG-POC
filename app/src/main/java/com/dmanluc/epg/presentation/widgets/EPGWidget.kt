@@ -56,8 +56,8 @@ class EPGWidget : ViewGroup {
         const val TIME_SPACING_TIMELINE_IN_MILLIS: Int = 15 * 60 * 1000        // 15 minutes
         const val TIME_SCROLL_TO_CURRENT_TIME_IN_MILLIS: Int = 1000            // 1000 ms
         const val HEIGHT_WEEKDAY_BAR_DP = 48
-        const val HEIGHT_NOW_BUTTON_DP = 52
-        const val WIDTH_NOW_BUTTON_DP = 76
+        const val HEIGHT_NOW_BUTTON_DP = 48
+        const val WIDTH_NOW_BUTTON_DP = 72
     }
 
     private val drawingRect = Rect()
