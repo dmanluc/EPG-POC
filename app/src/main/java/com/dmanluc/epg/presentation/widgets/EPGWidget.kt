@@ -764,7 +764,7 @@ class EPGWidget : ViewGroup {
                 weekDays.add(dayIndexInWeek,
                              Pair(getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.UK).capitalize()
                                   + "\n" + decimalFormat.format(get(Calendar.DAY_OF_MONTH)) + ".${decimalFormat.format(
-                                     get(Calendar.MONTH))}.", dayIndexInWeek == centralElement))
+                                     get(Calendar.MONTH) + 1)}.", dayIndexInWeek == centralElement))
                 add(Calendar.DATE, 1)
             }
         }
