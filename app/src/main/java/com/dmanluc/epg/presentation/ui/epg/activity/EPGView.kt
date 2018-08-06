@@ -12,6 +12,8 @@ interface EPGView: BaseView {
 
     fun showData(epgData: EPG)
 
+    fun handleRefreshButton(enable: Boolean)
+
     fun showLoadingProgress()
 
     fun hideLoadingProgress()

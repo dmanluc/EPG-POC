@@ -1,6 +1,8 @@
 package com.dmanluc.epg.presentation.ui.epg.activity
 
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import com.dmanluc.epg.R
 import com.dmanluc.epg.app.di.component.DaggerEPGActivityComponent
 import com.dmanluc.epg.domain.entity.Channel
@@ -10,6 +12,7 @@ import com.dmanluc.epg.presentation.base.BaseActivity
 import com.dmanluc.epg.presentation.widgets.EPGWidget
 import kotlinx.android.synthetic.main.activity_epg.bottomNavigation
 import kotlinx.android.synthetic.main.activity_epg.epg
+import kotlinx.android.synthetic.main.activity_epg.refreshButton
 import javax.inject.Inject
 
 class EPGActivity : BaseActivity<EPGView, EPGPresenterImpl>(),
@@ -37,6 +40,29 @@ class EPGActivity : BaseActivity<EPGView, EPGPresenterImpl>(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setupUi()
+
+        presenter.fetchEPGData()
+    }
+
+    override fun showData(epgData: EPG) {
+        epg.setEPGData(epgData)
+    }
+
+    override fun handleRefreshButton(enable: Boolean) {
+        refreshButton.visibility = if (enable) VISIBLE else GONE
+    }
+
+    override fun showLoadingProgress() {
+        showLoading()
+    }
+
+    override fun hideLoadingProgress() {
+        hideLoading()
+    }
+
+    private fun setupUi() {
         bottomNavigation.apply {
             setTextVisibility(false)
             enableAnimation(false)
@@ -44,11 +70,7 @@ class EPGActivity : BaseActivity<EPGView, EPGPresenterImpl>(),
             enableShiftingMode(false)
             selectedItemId = R.id.itemMenuEpg
         }
-        presenter.fetchEPGData()
-    }
 
-    override fun showData(epgData: EPG) {
-        epg.setEPGData(epgData)
         epg.setEPGClickListener(object : EPGWidget.EPGClickListener {
             override fun onChannelClicked(channelPosition: Int, epgChannel: Channel) {
             }
@@ -60,14 +82,8 @@ class EPGActivity : BaseActivity<EPGView, EPGPresenterImpl>(),
                 epg.resetView(withAnimation = true)
             }
         })
-    }
 
-    override fun showLoadingProgress() {
-        showLoading()
-    }
-
-    override fun hideLoadingProgress() {
-        hideLoading()
+        refreshButton.setOnClickListener { presenter.fetchEPGData() }
     }
 
 }

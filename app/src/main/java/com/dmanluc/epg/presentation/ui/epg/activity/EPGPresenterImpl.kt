@@ -15,6 +15,7 @@ import javax.inject.Inject
 class EPGPresenterImpl @Inject constructor(private val getEpgDataUseCase: GetEPGData) : BasePresenter<EPGView, EPGPresenterImpl.State>() {
 
     fun fetchEPGData() {
+        view?.handleRefreshButton(false)
         view?.showLoadingProgress()
         getEpgDataUseCase.execute(object : BaseObserver<EPG>() {
             override fun onSuccess(t: EPG) {
@@ -26,6 +27,7 @@ class EPGPresenterImpl @Inject constructor(private val getEpgDataUseCase: GetEPG
             override fun onErrorMessage(errorMessage: String?) {
                 super.onErrorMessage(errorMessage)
                 view?.hideLoadingProgress()
+                view?.handleRefreshButton(true)
             }
         }, null)
     }

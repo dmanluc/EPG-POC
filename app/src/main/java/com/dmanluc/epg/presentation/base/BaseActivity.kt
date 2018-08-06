@@ -13,8 +13,8 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import com.dmanluc.epg.app.core.App
 import com.dmanluc.epg.app.di.component.AppComponent
-import kotlinx.android.synthetic.main.activity_epg.loading_container
-import kotlinx.android.synthetic.main.activity_epg.loading_indicator
+import kotlinx.android.synthetic.main.activity_epg.loadingContainer
+import kotlinx.android.synthetic.main.activity_epg.loadingIndicator
 
 
 /**
@@ -92,22 +92,17 @@ abstract class BaseActivity<in V : BaseView, out P : Presenter<V>> : AppCompatAc
     }
 
     protected fun showLoading() {
-        loading_container.visibility = VISIBLE
-        loading_indicator.smoothToShow()
+        loadingContainer.visibility = VISIBLE
+        loadingIndicator.smoothToShow()
     }
 
     protected fun hideLoading() {
-        loading_indicator.smoothToHide()
-        loading_container.visibility = GONE
+        loadingIndicator.smoothToHide()
+        loadingContainer.visibility = GONE
     }
 
     private fun disableTouchLoadingView() {
-        loading_container.setOnTouchListener { _, _ -> true }
-    }
-
-    companion object {
-
-        private val TAG = this::class.java.simpleName
+        loadingContainer.setOnTouchListener { _, _ -> true }
     }
 
 }

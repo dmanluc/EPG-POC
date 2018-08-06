@@ -64,7 +64,7 @@ abstract class BasePresenter<V : BaseView, out S : BasePresenter.State> : Presen
 
     companion object {
 
-        private val KEY_PRESENTER_STATE: String = "key:bundle:presenter_state"
+        private const val KEY_PRESENTER_STATE: String = "key:bundle:presenter_state"
 
     }
 

@@ -51,13 +51,13 @@ import kotlin.math.min
 class EPGWidget : ViewGroup {
 
     companion object {
-        const val DAYS_MAX_HORIZONTAL_SCROLL_IN_MILLIS = 24 * 60 * 60 * 1000
+        const val DAYS_MAX_HORIZONTAL_SCROLL_IN_MILLIS = 24 * 60 * 60 * 1000   // 1 day (API Data)
         const val HOURS_TIMELINE_IN_MILLIS: Int = 1 * 60 * 60 * 1000           // 1 hour
         const val TIME_SPACING_TIMELINE_IN_MILLIS: Int = 15 * 60 * 1000        // 15 minutes
-        const val TIME_SCROLL_TO_CURRENT_TIME_IN_MILLIS: Int = 1000             // 500 ms
+        const val TIME_SCROLL_TO_CURRENT_TIME_IN_MILLIS: Int = 1000            // 1000 ms
         const val HEIGHT_WEEKDAY_BAR_DP = 48
-        const val HEIGHT_NOW_BUTTON_DP = 40
-        const val WIDTH_NOW_BUTTON_DP = 64
+        const val HEIGHT_NOW_BUTTON_DP = 52
+        const val WIDTH_NOW_BUTTON_DP = 76
     }
 
     private val drawingRect = Rect()
@@ -528,21 +528,20 @@ class EPGWidget : ViewGroup {
     }
 
     private fun drawWeekDayBar(canvas: Canvas, drawingRect: Rect) {
-        drawingRect.left = scrollX + channelWidth + channelMargin
+        drawingRect.left = scrollX + channelWidth
         drawingRect.top = scrollY
-        drawingRect.right = drawingRect.left + width
+        drawingRect.right = scrollX + width
         drawingRect.bottom = drawingRect.top + weekDayBarHeight
 
         paint.color = channelBackground
         canvas.drawRect(drawingRect, paint)
 
         paint.color = channelEventTitleColor
-        paint.textSize = 36.toFloat()
         paint.typeface = Typeface.create(SANS_SERIF, BOLD)
 
         val days = calculateCurrentWeekDaysInPrettyFormat()
 
-        val itemWidth = (days.map { paint.measureText(it.first) }.min() ?: 0f)
+        val itemWidth = (drawingRect.width() / days.size).toFloat()
 
         days.mapIndexed { index, weekDayString ->
             drawWeekDayBarItem(weekDayString.first, weekDayString.second, index, drawingRect, itemWidth, canvas)
@@ -560,7 +559,7 @@ class EPGWidget : ViewGroup {
 
         canvas.drawMultilineText(weekDayString, TextPaint(paint), itemWidth.toInt(),
                                  (newDrawingRect.left + channelPadding + (itemWidth * index)),
-                                 newDrawingRect.top.toFloat() + weekDayBarHeight / 5,
+                                 newDrawingRect.top.toFloat() + channelPadding,
                                  alignment = Layout.Alignment.ALIGN_CENTER)
     }
 
