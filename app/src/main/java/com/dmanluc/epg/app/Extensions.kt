@@ -23,11 +23,9 @@ import java.util.Locale
  */
 
 fun Long.toTimeFormat(formatTimePattern: String): String? {
-
     val date = Date(this)
     val formatter = SimpleDateFormat(formatTimePattern, Locale.getDefault())
     return formatter.format(date)
-
 }
 
 fun String.isoDateToMillis(): Long {
