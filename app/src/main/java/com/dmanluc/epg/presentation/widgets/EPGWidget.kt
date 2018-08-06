@@ -60,10 +60,7 @@ class EPGWidget : ViewGroup {
         const val WIDTH_NOW_BUTTON_DP = 64
     }
 
-    private var epgData: EPG? = null
-    private var epgClickListener: EPGClickListener? = null
-
-    private var drawingRect = Rect()
+    private val drawingRect = Rect()
     private val measuringRect = Rect()
     private val clipRect = Rect()
     private val paint = Paint().apply { typeface = Typeface.DEFAULT }
@@ -80,6 +77,9 @@ class EPGWidget : ViewGroup {
 
     private lateinit var scroller: Scroller
     private lateinit var gestureDetector: GestureDetector
+
+    private var epgData: EPG? = null
+    private var epgClickListener: EPGClickListener? = null
 
     private var epgBackground: Int = 0
     private var channelMargin: Int = 0
@@ -145,7 +145,8 @@ class EPGWidget : ViewGroup {
                 channelEventTitleColor = getColor(R.styleable.EPG_epgChannelEventTitleColor,
                                                   ContextCompat.getColor(context, R.color.epgChannelEventTitleColor))
                 channelEventScheduleColor = getColor(R.styleable.EPG_epgChannelEventScheduleColor,
-                                                     ContextCompat.getColor(context, R.color.epgChannelEventScheduleColor))
+                                                     ContextCompat.getColor(context,
+                                                                            R.color.epgChannelEventScheduleColor))
                 channelEventTextSize = getDimensionPixelSize(R.styleable.EPG_epgChannelEventTextSize,
                                                              resources.getDimensionPixelSize(
                                                                      R.dimen.textSize_epg_event_14sp))
@@ -240,11 +241,6 @@ class EPGWidget : ViewGroup {
         this.epgClickListener = listener
     }
 
-    /**
-     * This will recalculate boundaries, maximal scroll and scroll to start position which is current time.
-     * To be used on device rotation etc since the device height and width will change.
-     * @param withAnimation true if scroll to current position should be animated.
-     */
     fun resetView(withAnimation: Boolean) {
         epgData?.let {
             if (it.channels.isNotEmpty()) {
@@ -355,7 +351,6 @@ class EPGWidget : ViewGroup {
                     .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .override(min(channelWidth, channelHeight))
                     .into(channelImageTargetCache[imageURL] as Target<Bitmap>)
-
         }
     }
 
@@ -391,13 +386,31 @@ class EPGWidget : ViewGroup {
         return drawingRect
     }
 
+    private fun drawChannelItemsRightStroke(canvas: Canvas, drawingRect: Rect) {
+        drawingRect.left = scrollX + channelWidth
+        drawingRect.top = scrollY + weekDayBarHeight + timeBarHeight
+        drawingRect.right = drawingRect.left + channelMargin
+        drawingRect.bottom = height + scrollY
+
+        paint.color = channelCurrentEventBackground
+        canvas.drawRect(drawingRect, paint)
+    }
+
+    private fun drawChannelItemsBottomStroke(channelPosition: Int, canvas: Canvas, drawingRect: Rect) {
+        drawingRect.left = scrollX
+        drawingRect.top = calculateVerticalCoordinateFromChannelPosition(channelPosition)
+        drawingRect.right = drawingRect.left + channelWidth
+        drawingRect.bottom = drawingRect.top + channelMargin
+
+        paint.color = channelCurrentEventBackground
+        canvas.drawRect(drawingRect, paint)
+    }
+
     private fun drawSchedules(canvas: Canvas, drawingRect: Rect) {
         val firstPos = getFirstVisibleChannelPosition()
         val lastPos = getLastVisibleChannelPosition()
 
         for (pos in firstPos..lastPos) {
-
-            // Set clip rectangle
             clipRect.left = scrollX + channelWidth + channelMargin
             clipRect.top = calculateVerticalCoordinateFromChannelPosition(pos)
             clipRect.right = scrollX + width
@@ -406,26 +419,24 @@ class EPGWidget : ViewGroup {
             canvas.save()
             canvas.clipRect(clipRect)
 
-            // Draw each event
-            var foundFirst = false
+            var foundFirstVisibleChannelSchedule = false
 
-            val epgEvents = epgData?.channels?.get(pos)?.schedules ?: emptyList()
+            val channelSchedules = epgData?.channels?.get(pos)?.schedules ?: emptyList()
 
-            for (schedule in epgEvents) {
+            for (schedule in channelSchedules) {
                 if (isScheduleVisible(schedule.startTime, schedule.endTime)) {
-                    drawEvent(canvas, pos, schedule, drawingRect)
-                    foundFirst = true
-                } else if (foundFirst) {
+                    drawChannelSchedules(canvas, pos, schedule, drawingRect)
+                    foundFirstVisibleChannelSchedule = true
+                } else if (foundFirstVisibleChannelSchedule) {
                     break
                 }
             }
             canvas.restore()
         }
-
     }
 
-    private fun drawEvent(canvas: Canvas, channelPosition: Int, schedule: Schedule, drawingRect: Rect) {
-        setEventDrawingRectangle(channelPosition, schedule.startTime, schedule.endTime, drawingRect)
+    private fun drawChannelSchedules(canvas: Canvas, channelPosition: Int, schedule: Schedule, drawingRect: Rect) {
+        setChannelScheduleDrawingRectangle(channelPosition, schedule.startTime, schedule.endTime, drawingRect)
 
         paint.color = if (schedule.isLive()) channelCurrentEventBackground else channelEventBackground
         canvas.drawRect(drawingRect, paint)
@@ -437,18 +448,20 @@ class EPGWidget : ViewGroup {
         paint.textSize = channelEventTextSize.toFloat()
 
         val title = "${schedule.title}\n${schedule.timeInPrettyFormat}"
-        drawString(canvas, paint, title, drawingRect.left, drawingRect.top + 3 * channelPadding, measuringRect)
+        drawChannelScheduleInfo(canvas, paint, title, drawingRect.left, drawingRect.top + 3 * channelPadding,
+                                measuringRect)
     }
 
-    private fun setEventDrawingRectangle(channelPosition: Int, start: Long, end: Long, drawingRect: Rect) {
+    private fun setChannelScheduleDrawingRectangle(channelPosition: Int, start: Long, end: Long, drawingRect: Rect) {
         drawingRect.left = calculateHorizontalCoordinateFromTime(start)
         drawingRect.top = calculateVerticalCoordinateFromChannelPosition(channelPosition) + channelMargin
         drawingRect.right = calculateHorizontalCoordinateFromTime(end) - channelMargin
         drawingRect.bottom = drawingRect.top + channelHeight + channelMargin
     }
 
-    private fun drawString(canvas: Canvas, paint: Paint, str: String, x: Int, y: Int, measuringRect: Rect) {
-        val lines = str.split(regex = "\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+    private fun drawChannelScheduleInfo(canvas: Canvas, paint: Paint, scheduleInfo: String, x: Int, y: Int,
+                                        measuringRect: Rect) {
+        val lines = scheduleInfo.split(regex = "\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
         var yoff = 0
 
@@ -464,16 +477,6 @@ class EPGWidget : ViewGroup {
             paint.getTextBounds(lines[i], 0, lines[i].length, measuringRect)
             yoff += measuringRect.height() + channelPadding
         }
-    }
-
-    private fun drawTimeBarBottomStroke(canvas: Canvas, drawingRect: Rect) {
-        drawingRect.left = scrollX
-        drawingRect.top = scrollY + timeBarHeight + weekDayBarHeight
-        drawingRect.right = drawingRect.left + width
-        drawingRect.bottom = drawingRect.top + channelMargin
-
-        paint.color = channelCurrentEventBackground
-        canvas.drawRect(drawingRect, paint)
     }
 
     private fun drawTimeBar(canvas: Canvas, drawingRect: Rect) {
@@ -512,6 +515,16 @@ class EPGWidget : ViewGroup {
         }
 
         drawTimeBarBottomStroke(canvas, drawingRect)
+    }
+
+    private fun drawTimeBarBottomStroke(canvas: Canvas, drawingRect: Rect) {
+        drawingRect.left = scrollX
+        drawingRect.top = scrollY + timeBarHeight + weekDayBarHeight
+        drawingRect.right = drawingRect.left + width
+        drawingRect.bottom = drawingRect.top + channelMargin
+
+        paint.color = channelCurrentEventBackground
+        canvas.drawRect(drawingRect, paint)
     }
 
     private fun drawWeekDayBar(canvas: Canvas, drawingRect: Rect) {
@@ -561,59 +574,6 @@ class EPGWidget : ViewGroup {
         canvas.drawRect(drawingRect, paint)
     }
 
-    private fun drawStarItem(canvas: Canvas, drawingRect: Rect) {
-        drawingRect.left = scrollX
-        drawingRect.top = scrollY
-        drawingRect.right = drawingRect.left + channelWidth
-        drawingRect.bottom = drawingRect.top + weekDayBarHeight - channelMargin
-
-        val starDrawable = ContextCompat.getDrawable(context, R.drawable.ic_star)
-
-        paint.color = channelBackground
-        canvas.drawRect(drawingRect, paint)
-
-        val drawableRect = drawingRect
-        drawableRect.left += (2.75 * channelPadding).toInt()
-        drawableRect.top += (1.25 * channelPadding).toInt()
-        drawableRect.right -= (2.75 * channelPadding).toInt()
-        drawableRect.bottom -= (1.25 * channelPadding).toInt()
-
-        starDrawable?.setBounds(drawableRect.left, drawableRect.top, drawableRect.right, drawableRect.bottom)
-        starDrawable?.draw(canvas)
-
-        drawStarItemRightStroke(canvas, drawingRect)
-    }
-
-    private fun drawStarItemRightStroke(canvas: Canvas, drawingRect: Rect) {
-        drawingRect.left = scrollX + channelWidth
-        drawingRect.top = scrollY
-        drawingRect.right = drawingRect.left + channelMargin
-        drawingRect.bottom = weekDayBarHeight + scrollY
-
-        paint.color = channelCurrentEventBackground
-        canvas.drawRect(drawingRect, paint)
-    }
-
-    private fun drawChannelItemsRightStroke(canvas: Canvas, drawingRect: Rect) {
-        drawingRect.left = scrollX + channelWidth
-        drawingRect.top = scrollY + weekDayBarHeight + timeBarHeight
-        drawingRect.right = drawingRect.left + channelMargin
-        drawingRect.bottom = height + scrollY
-
-        paint.color = channelCurrentEventBackground
-        canvas.drawRect(drawingRect, paint)
-    }
-
-    private fun drawChannelItemsBottomStroke(channelPosition: Int, canvas: Canvas, drawingRect: Rect) {
-        drawingRect.left = scrollX
-        drawingRect.top = calculateVerticalCoordinateFromChannelPosition(channelPosition)
-        drawingRect.right = drawingRect.left + channelWidth
-        drawingRect.bottom = drawingRect.top + channelMargin
-
-        paint.color = channelCurrentEventBackground
-        canvas.drawRect(drawingRect, paint)
-    }
-
     private fun drawTimeLine(canvas: Canvas, drawingRect: Rect) {
         val now = System.currentTimeMillis()
 
@@ -657,6 +617,39 @@ class EPGWidget : ViewGroup {
 
     private fun shouldNowButtonBeVisible() = abs(
             calculateHorizontalCoordinateAtHalfTimeLine() - scrollX) > (width / 3).toLong()
+
+    private fun drawStarItem(canvas: Canvas, drawingRect: Rect) {
+        drawingRect.left = scrollX
+        drawingRect.top = scrollY
+        drawingRect.right = drawingRect.left + channelWidth
+        drawingRect.bottom = drawingRect.top + weekDayBarHeight - channelMargin
+
+        val starDrawable = ContextCompat.getDrawable(context, R.drawable.ic_star)
+
+        paint.color = channelBackground
+        canvas.drawRect(drawingRect, paint)
+
+        val drawableRect = drawingRect
+        drawableRect.left += (2.75 * channelPadding).toInt()
+        drawableRect.top += (1.25 * channelPadding).toInt()
+        drawableRect.right -= (2.75 * channelPadding).toInt()
+        drawableRect.bottom -= (1.25 * channelPadding).toInt()
+
+        starDrawable?.setBounds(drawableRect.left, drawableRect.top, drawableRect.right, drawableRect.bottom)
+        starDrawable?.draw(canvas)
+
+        drawStarItemRightStroke(canvas, drawingRect)
+    }
+
+    private fun drawStarItemRightStroke(canvas: Canvas, drawingRect: Rect) {
+        drawingRect.left = scrollX + channelWidth
+        drawingRect.top = scrollY
+        drawingRect.right = drawingRect.left + channelMargin
+        drawingRect.bottom = weekDayBarHeight + scrollY
+
+        paint.color = channelCurrentEventBackground
+        canvas.drawRect(drawingRect, paint)
+    }
 
     private fun calculateMillisPerPixel(): Long {
         return (HOURS_TIMELINE_IN_MILLIS / (resources.displayMetrics.widthPixels - channelWidth - channelMargin)).toLong()
@@ -727,12 +720,6 @@ class EPGWidget : ViewGroup {
         return if (scaleY + height > position * channelHeight && position < channelsCount - 1) position + 1 else position
     }
 
-    private fun getChannelPosition(y: Int): Int {
-        val channelPosition = (timeBarHeight + weekDayBarHeight + channelMargin) / (channelHeight + channelMargin)
-
-        return if (epgData?.channels?.isEmpty() == true) -1 else channelPosition
-    }
-
     private fun isScheduleVisible(start: Long, end: Long): Boolean {
         return (start in lowerTimeBound..upperTimeBound
                 || end in lowerTimeBound..upperTimeBound
@@ -776,11 +763,9 @@ class EPGWidget : ViewGroup {
 
         override fun onSingleTapUp(e: MotionEvent): Boolean {
 
-            // This is absolute coordinate on screen not taking scroll into account.
             val x = e.x.toInt()
             val y = e.y.toInt()
 
-            // Adding scroll to clicked coordinate
             val scrollX = scrollX + x
             val scrollY = scrollY + y
 
@@ -789,24 +774,6 @@ class EPGWidget : ViewGroup {
                     it.onNowButtonClicked()
                 }
             }
-            //            val channelPosition = getChannelPosition(scrollY)
-            //            if (channelPosition != -1 && mClickListener != null) {
-            //                if (calculateResetButtonHitArea().contains(scrollX, scrollY)) {
-            //                    // Reset button clicked
-            //                    mClickListener.onResetButtonClicked()
-            //                } else if (calculateChannelsHitArea().contains(x, y)) {
-            //                    // Channel area is clicked
-            //                    mClickListener.onChannelClicked(channelPosition, epgData.getChannel(channelPosition))
-            //                } else if (calculateProgramsHitArea().contains(x, y)) {
-            //                    // Event area is clicked
-            //                    val programPosition = getProgramPosition(channelPosition, getTimeFrom(
-            //                            getScrollX() + x - calculateProgramsHitArea().left))
-            //                    if (programPosition != -1) {
-            //                        mClickListener.onEventClicked(channelPosition, programPosition,
-            //                                                      epgData.getEvent(channelPosition, programPosition))
-            //                    }
-            //                }
-            //            }
 
             return true
         }
