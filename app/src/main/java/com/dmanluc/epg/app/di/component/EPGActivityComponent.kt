@@ -2,7 +2,7 @@ package com.dmanluc.epg.app.di.component
 
 import com.dmanluc.epg.app.di.module.EPGActivityModule
 import com.dmanluc.epg.app.di.scope.ActivityScope
-import com.dmanluc.epg.presentation.epg.activity.EPGActivity
+import com.dmanluc.epg.presentation.ui.epg.activity.EPGActivity
 import dagger.Component
 
 /**

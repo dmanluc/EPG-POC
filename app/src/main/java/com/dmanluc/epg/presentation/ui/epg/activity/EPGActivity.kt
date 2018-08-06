@@ -1,4 +1,4 @@
-package com.dmanluc.epg.presentation.epg.activity
+package com.dmanluc.epg.presentation.ui.epg.activity
 
 import android.os.Bundle
 import com.dmanluc.epg.R
@@ -12,7 +12,8 @@ import kotlinx.android.synthetic.main.activity_epg.bottomNavigation
 import kotlinx.android.synthetic.main.activity_epg.epg
 import javax.inject.Inject
 
-class EPGActivity : BaseActivity<EPGView, EPGPresenterImpl>(), EPGView {
+class EPGActivity : BaseActivity<EPGView, EPGPresenterImpl>(),
+                    EPGView {
 
     @Inject
     lateinit var internalPresenter: EPGPresenterImpl

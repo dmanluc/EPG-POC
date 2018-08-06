@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".presentation.splash.activity.SplashActivity"
+            android:name=".presentation.ui.splash.activity.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
 
@@ -27,7 +27,7 @@
         </activity>
 
         <activity
-            android:name=".presentation.epg.activity.EPGActivity"
+            android:name=".presentation.ui.epg.activity.EPGActivity"
             android:screenOrientation="portrait">
 
         </activity>

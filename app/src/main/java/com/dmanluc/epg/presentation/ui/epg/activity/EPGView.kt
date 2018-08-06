@@ -1,4 +1,4 @@
-package com.dmanluc.epg.presentation.epg.activity
+package com.dmanluc.epg.presentation.ui.epg.activity
 
 import com.dmanluc.epg.domain.entity.EPG
 import com.dmanluc.epg.presentation.base.BaseView

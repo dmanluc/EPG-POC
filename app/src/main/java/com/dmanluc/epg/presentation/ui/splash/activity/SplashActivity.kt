@@ -1,9 +1,9 @@
-package com.dmanluc.epg.presentation.splash.activity
+package com.dmanluc.epg.presentation.ui.splash.activity
 
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.dmanluc.epg.presentation.epg.activity.EPGActivity
+import com.dmanluc.epg.presentation.ui.epg.activity.EPGActivity
 
 /**
  *  Initial splash activity
