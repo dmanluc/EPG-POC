@@ -8,7 +8,7 @@ import dagger.Component
 /**
  *  Component Interface for Dependency Injection (DI) in EPGActivity
  *
- * @author   Daniel Manrique <daniel.manrique@uxsmobile.com>
+ * @author   Daniel Manrique <dmanluc91@gmail.com>
  * @version  1
  * @since    2/8/18.
  */

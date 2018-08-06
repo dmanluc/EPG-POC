@@ -10,7 +10,7 @@ import javax.inject.Inject
 /**
  *  EPG remote repository implementation
  *
- * @author   Daniel Manrique <daniel.manrique@uxsmobile.com>
+ * @author   Daniel Manrique <dmanluc91@gmail.com>
  * @version  1
  * @since    2/8/18.
  */

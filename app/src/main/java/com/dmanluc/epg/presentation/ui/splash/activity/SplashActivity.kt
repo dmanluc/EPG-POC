@@ -8,7 +8,7 @@ import com.dmanluc.epg.presentation.ui.epg.activity.EPGActivity
 /**
  *  Initial splash activity
  *
- * @author   Daniel Manrique <daniel.manrique@uxsmobile.com>
+ * @author   Daniel Manrique <dmanluc91@gmail.com>
  * @version  1
  * @since    6/8/18.
  */

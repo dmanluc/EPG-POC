@@ -9,7 +9,7 @@ import com.dmanluc.epg.domain.entity.Schedule
 /**
  *  Transformer to adapt EPG output contract from JSON response to EPG domain entity of the app
  *
- * @author   Daniel Manrique <daniel.manrique@uxsmobile.com>
+ * @author   Daniel Manrique <dmanluc91@gmail.com>
  * @version  1
  * @since    2/8/18.
  */
